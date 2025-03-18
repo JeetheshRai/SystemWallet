@@ -1,1 +1,35 @@
-<p>wallet-setup works!</p>
+<div *ngIf="!userData" class="wallet-setup-container">
+    <h2 class="title">Setup Wallet</h2>
+    <form [formGroup]="walletForm" (ngSubmit)="submitForm()" class="wallet-form">
+      <div class="form-group">
+        <label for="name" class="form-label">Username</label>
+        <input type="text" id="name" formControlName="name" class="form-input" />
+        <div *ngIf="walletForm.controls['name'].invalid && walletForm.controls['name'].touched" class="error-message">
+          Username is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="balance" class="form-label">Initial Balance</label>
+        <input type="number" id="balance" formControlName="balance" class="form-input" step="any" inputmode="numeric" />
+        <div *ngIf="walletForm.controls['balance'].invalid && walletForm.controls['balance'].touched" class="error-message">
+          <div *ngIf="walletForm.controls['balance'].errors?.['required']">
+            Balance is required.
+          </div>
+          <div *ngIf="walletForm.controls['balance'].errors?.['min']">
+            Balance must be greater than or equal to 0.
+          </div>
+          <div *ngIf="walletForm.controls['balance'].errors?.['invalidDecimalPlaces']">
+            Balance can have up to 4 decimal places only.
+          </div>
+        </div>
+      </div>
+  
+      <button type="submit" class="submit-btn" [disabled]="walletForm.invalid">Submit</button>
+    </form>
+  </div>
+  
+  <div *ngIf="userData" class="wallet-message">
+    <p>Wallet is already initialized. <a [routerLink]="['/transactions']" class="link">Go to Transactions</a></p>
+  </div>
+  
