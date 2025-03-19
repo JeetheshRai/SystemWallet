@@ -55,7 +55,7 @@ export class WalletSetupComponent implements OnInit {
         this.dataService.setWalletData(walletData.data)
         this.router.navigate(['/transactions']);
       }else{
-        this.toastr.error(walletData.message, 'Error');
+        this.toastr.error(walletData?.message || 'Something went wrong.', 'Error');
       }
     }
   }

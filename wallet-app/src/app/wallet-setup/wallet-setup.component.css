@@ -1,4 +1,3 @@
-/* Styling for the wallet setup page */
 .wallet-setup-container {
     width: 100%;
     max-width: 400px;
@@ -56,7 +55,6 @@
     background-color: #0056b3;
   }
   
-  /* Styling for the already initialized wallet message */
   .wallet-message {
     text-align: center;
     font-size: 1.2em;
@@ -72,3 +70,8 @@
     text-decoration: underline;
   }
   
+  
+  .error-message {
+    color: red;
+    font-size: 0.8em;
+  }

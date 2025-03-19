@@ -1,1 +1,86 @@
-<p>transaction works!</p>
+<div class="wallet-container">
+    <div class="header">
+        <h2>Wallet Name: {{ userData?.name }}</h2>
+        <h4>Wallet ID: {{ userData?._id }}</h4>
+        <p class="balance">Balance: {{ userData?.balance | currency:'INR':true:'1.4-4' }}</p>
+    </div>
+    <div class="transaction-section">
+        <h3>Transaction</h3>
+        <form [formGroup]="transactionForm" (ngSubmit)="submitTransaction()">
+            <div class="transaction-input">
+                <input 
+                    type="number" 
+                    formControlName="balance" 
+                    placeholder="Balance" 
+                    class="input-field" 
+                />
+                <div *ngIf="amountControl?.touched && amountControl?.invalid" class="error-message">
+                    <div *ngIf="amountControl?.errors?.['required']">Amount is required.</div>
+                    <div *ngIf="amountControl?.errors?.['min']">Amount must be greater than or equal to 1.</div>
+                    <div *ngIf="amountControl?.errors?.['invalidDecimalPlaces']">Amount can only have up to 4 decimal places.</div>
+                </div>
+                <div class="form-group">
+                  <label for="description" class="form-label">Description</label>
+                  <input type="text" id="description" formControlName="description" class="input-field" />
+                </div>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" formControlName="isCredit" [value]="true" /> Credit
+                    </label>
+                    <label>
+                        <input type="radio" formControlName="isCredit" [value]="false" /> Debit
+                    </label>
+                </div>
+            </div>
+            <button class="btn-submit" type="submit" [disabled]="transactionForm.invalid">Submit Transaction</button>
+        </form>
+    </div>
+
+    <div class="transaction-history">
+        <h3>Transactions</h3><div class="sort-options">
+            <label for="sortBy" class="sort-label">Sort By :</label>
+            <div class="select-container">
+                <select id="sortBy" (change)="onSortChange($event)" class="sort-select">
+                    <option value="new_date">New Date</option>
+                    <option value="old_date">Old Date</option>
+                    <option value="asc">Ascending Amount</option>
+                    <option value="desc">Descending Amount</option>
+                </select>
+            </div>
+        </div>
+        <table class="transaction-table">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Balance</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let transaction of transactions">
+                    <td>{{ transaction?._id }}</td>
+                    <td>{{ transaction?.balance | currency:'INR':true:'1.4-4' }}</td>
+                    <td>{{ transaction?.amount | currency:'INR':true:'1.4-4' }}</td>
+                    <td>{{ transaction?.type }}</td>
+                    <td>{{ transaction?.description }}</td>
+                    <td>{{ transaction?.date | date: 'short' }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div *ngIf="transactions.length === 0">
+            <p>No records found</p>
+        </div>
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="pagination-controls" *ngIf="totalPages">
+        <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button (click)="goToNextPage()" [disabled]="currentPage === totalPages">Next</button>
+    </div>
+
+    <button class="btn-export" (click)="exportCSV()">Export CSV</button>
+</div>

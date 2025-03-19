@@ -10,8 +10,10 @@ const dbInit = async () => {
 };
 dbInit()
 const walletController = require('./controllers/walletController');
-app.use('/', walletController);
+const transactionController = require('./controllers/transactionController');
+app.use('/wallet', walletController);
+app.use('/transaction', transactionController);
 const port = config.server_port
 app.listen(port,()=>{
-    console.log('chat server started at '+ new Date() + ' on '+ port)
+    console.log('server started at '+ new Date() + ' on '+ port)
 })
