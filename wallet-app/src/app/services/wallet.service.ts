@@ -11,5 +11,10 @@ export class WalletService {
     const wallet = { name, balance };
     return this.apiService.post<any>('/wallet/setup', wallet);
   }
+  
+
+  getWallet(walletId:string){
+    return this.apiService.get<any>(`/wallet/wallet/${walletId}`);
+  }
 
 }

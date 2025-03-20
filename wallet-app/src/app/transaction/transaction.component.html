@@ -2,10 +2,11 @@
     <div class="header">
         <h2>Wallet Name: {{ userData?.name }}</h2>
         <h4>Wallet ID: {{ userData?._id }}</h4>
-        <p class="balance">Balance: {{ userData?.balance | currency:'INR':true:'1.4-4' }}</p>
+        <p class="balance">Balance: {{ userData?.balance  | currency:'INR':'symbol':'1.4-4' }}</p>
+        <button class="refresh-button" (click)="refreshData()">Refresh</button>
     </div>
     <div class="transaction-section">
-        <h3>Transaction</h3>
+        <h3>Transaction *</h3>
         <form [formGroup]="transactionForm" (ngSubmit)="submitTransaction()">
             <div class="transaction-input">
                 <input 
@@ -25,10 +26,10 @@
                 </div>
                 <div class="radio-group">
                     <label>
-                        <input type="radio" formControlName="isCredit" [value]="true" /> Credit
+                        <input type="radio" formControlName="isCredit" [value]="true" /> Credit *
                     </label>
                     <label>
-                        <input type="radio" formControlName="isCredit" [value]="false" /> Debit
+                        <input type="radio" formControlName="isCredit" [value]="false" /> Debit *
                     </label>
                 </div>
             </div>
@@ -62,8 +63,8 @@
             <tbody>
                 <tr *ngFor="let transaction of transactions">
                     <td>{{ transaction?._id }}</td>
-                    <td>{{ transaction?.balance | currency:'INR':true:'1.4-4' }}</td>
-                    <td>{{ transaction?.amount | currency:'INR':true:'1.4-4' }}</td>
+                    <td>{{ transaction?.balance  | currency:'INR':'symbol':'1.4-4' }}</td>
+                    <td>{{ transaction?.amount  | currency:'INR':'symbol':'1.4-4' }}</td>
                     <td>{{ transaction?.type }}</td>
                     <td>{{ transaction?.description }}</td>
                     <td>{{ transaction?.date | date: 'short' }}</td>
@@ -82,5 +83,5 @@
         <button (click)="goToNextPage()" [disabled]="currentPage === totalPages">Next</button>
     </div>
 
-    <button class="btn-export" (click)="exportCSV()">Export CSV</button>
+    <button class="btn-export" (click)="exportCSV()" *ngIf="transactions.length > 0">Export CSV</button>
 </div>

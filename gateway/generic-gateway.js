@@ -87,6 +87,22 @@ class GenericGateway {
             }
         })
     }
+    
+    cursor(params) {
+        try {
+            const record = mongodb.cursor(
+                this.collectionName,
+                params.query,
+                params.projection,
+                params['sort'],
+                params.skip,
+                params.limit
+            );
+            return record;
+        } catch (err) {
+            throw err;
+        }
+    }
 
 }
 

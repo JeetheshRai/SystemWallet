@@ -6,6 +6,9 @@ import { Router, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators, FormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { TransactionService } from '../services/transaction.service';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from '../config';
+import { WalletService } from '../services/wallet.service';
+
 @Component({
   selector: 'app-transaction',
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule],
@@ -21,9 +24,9 @@ export class TransactionComponent implements OnInit {
   public transactionCount = 0
   public currentPage = 1;
   public itemsPerPage = 10;
-  public sortPage : any = {date:-1}
+  public sortPage: any = { date: -1 }
 
-  constructor(private dataService: DataService, private router: Router, private transactionService: TransactionService, private toastr: ToastrService) {
+  constructor(private dataService: DataService, private router: Router, private transactionService: TransactionService, private walletService: WalletService, private toastr: ToastrService) {
     this.transactionForm = new FormGroup({
       balance: new FormControl(null, [
         Validators.required,
@@ -77,18 +80,18 @@ export class TransactionComponent implements OnInit {
   }
 
   onSortChange(event: any): void {
-    if(event.target.value=='new_date'){
-      this.sortPage = { date : -1 }
-    }else if(event.target.value=='old_date'){
-      this.sortPage = { date : 1 }
-    }else if(event.target.value=='asc'){
-      this.sortPage = { amount : 1 }
-    }else if(event.target.value=='desc'){
-      this.sortPage = { amount : -1 }
+    if (event.target.value == 'new_date') {
+      this.sortPage = { date: -1 }
+    } else if (event.target.value == 'old_date') {
+      this.sortPage = { date: 1 }
+    } else if (event.target.value == 'asc') {
+      this.sortPage = { amount: 1 }
+    } else if (event.target.value == 'desc') {
+      this.sortPage = { amount: -1 }
     }
     this.loadTransacation()
   }
-  
+
 
   async submitTransaction() {
     if (this.transactionForm.valid) {
@@ -96,11 +99,18 @@ export class TransactionComponent implements OnInit {
       let transactionResponse: any = await lastValueFrom(this.transactionService.submitTransaction(this.userData._id, isCredit, balance, description));
       if (transactionResponse.status == 'success') {
         this.userData.balance = transactionResponse?.data?.balance || this.userData.balance;
-        this.dataService.setWalletData(this.userData)
+          this.dataService.setWalletData(this.userData)
+          this.transactionForm.reset({
+            balance: null,
+            description: '',
+            isCredit: ''
+          });
         this.loadTransacation()
       } else {
         this.toastr.error(transactionResponse?.message || 'Something went wrong.', 'Error');
       }
+    } else{
+      this.toastr.error('Please fill the field Balance and select Credit or Debit.', 'Error');
     }
   }
 
@@ -121,7 +131,21 @@ export class TransactionComponent implements OnInit {
     return this.transactionForm.get('isCredit');
   }
 
-  exportCSV(){
-    
+  async exportCSV() {
+    const link = document.createElement('a');
+    link.href = environment.server_api_endpoint + '/transaction/downloadCSV/' + this.userData._id;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  async refreshData(){
+    let walletResponse: any = await lastValueFrom(this.walletService.getWallet(this.userData._id));
+    if (walletResponse.status == 'success') {
+      this.dataService.setWalletData(walletResponse.data)
+      this.toastr.success('Successfully refreshed Wallet ID: ' + walletResponse?.data?._id, 'Success');
+    } else {
+      this.toastr.error(walletResponse?.message || 'Something went wrong.', 'Error');
+    }
   }
 }

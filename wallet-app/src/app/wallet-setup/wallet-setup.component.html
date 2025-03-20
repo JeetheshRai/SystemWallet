@@ -2,7 +2,7 @@
     <h2 class="title">Setup Wallet</h2>
     <form [formGroup]="walletForm" (ngSubmit)="submitForm()" class="wallet-form">
       <div class="form-group">
-        <label for="name" class="form-label">Username</label>
+        <label for="name" class="form-label">Username *</label>
         <input type="text" id="name" formControlName="name" class="form-input" />
         <div *ngIf="walletForm.controls['name'].invalid && walletForm.controls['name'].touched" class="error-message">
           Username is required.

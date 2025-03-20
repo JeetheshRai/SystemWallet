@@ -1,5 +1,6 @@
 const express = require('express');
 const transactionService = require('../services/transactionService');
+const file_streamUtil = require('../utils/file_stream.util');
 const router = express.Router();
 
 class transactionController {
@@ -42,11 +43,34 @@ class transactionController {
             });
         }
     }
+
+    async downloadCSV(req, res) {
+        try {
+            if (!req?.params?.walletId) {
+                return res.json({ status: 'failed', message: 'Missing values.' });
+            }
+            let custom_name = req?.params?.walletId+'_'+new Date().getTime()+'.csv'
+            req.params.file_path =  './uploads/'+ custom_name
+            await transactionService.downloadCSV(req?.params)
+            res.download(req.params.file_path,custom_name, (err) => {
+                file_streamUtil.unLink(req.params.file_path).catch(error => {})
+                if (err) {
+                    res.status(500).send('Failed to download CSV');
+                }
+            });
+        } catch (error) {
+            res.json({
+                status: 'failed',
+                message : error?.message || 'Something went wrong. Please try again.'
+            });
+        }
+    }
 }
 
 const transactionControllerInstance = new transactionController();
 
 router.get('/transactions', transactionControllerInstance.getTransaction.bind(transactionControllerInstance));
 router.post('/transact/:walletId', transactionControllerInstance.submitTransaction.bind(transactionControllerInstance));
+router.get('/downloadCSV/:walletId', transactionControllerInstance.downloadCSV.bind(transactionControllerInstance));
 
 module.exports = router;

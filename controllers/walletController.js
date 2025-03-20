@@ -43,6 +43,6 @@ class WalletController {
 const walletControllerInstance = new WalletController();
 
 router.post('/setup', walletControllerInstance.setupWallet.bind(walletControllerInstance));
-router.get('/wallet/:walletId', walletControllerInstance.setupWallet.bind(walletControllerInstance));
+router.get('/wallet/:walletId', walletControllerInstance.getWallet.bind(walletControllerInstance));
 
 module.exports = router;
