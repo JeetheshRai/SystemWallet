@@ -1,3 +1,3 @@
 export const environment = {
-    server_api_endpoint: 'http://localhost:8000',
+    server_api_endpoint: 'https://systemwallet.onrender.com',
 };
