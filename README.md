@@ -204,7 +204,7 @@ Page 2: Show balance, make transactions, transaction history (sortable, paginate
 🌐 Deployment
 API Hosted at: https://systemwallet.onrender.com
 
-Frontend Hosted at: https://rococo-dodol-e64971.netlify.app
+Frontend Hosted at: https://warm-capybara-9da840.netlify.app
 
 
 🔒 GitHub Access
