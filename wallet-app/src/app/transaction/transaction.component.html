@@ -38,7 +38,7 @@
     </div>
 
     <div class="transaction-history">
-        <h3>Transactions</h3><div class="sort-options">
+        <h3>Transactions</h3><div class="sort-options" *ngIf="transactions.length > 1">
             <label for="sortBy" class="sort-label">Sort By :</label>
             <div class="select-container">
                 <select id="sortBy" (change)="onSortChange($event)" class="sort-select">

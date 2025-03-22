@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class DataService {
   public $user_data = new BehaviorSubject<any>(null);
+  public $loading = new BehaviorSubject<any>(false);
   constructor() { }
   setWalletData(data:{}){
     localStorage.setItem('choco',JSON.stringify(data))
@@ -18,4 +19,9 @@ export class DataService {
     this.$user_data.next(JSON.parse(data));
     return JSON.parse(data)
   }
+  
+  setLoading(data:boolean){
+    this.$loading.next(data);
+  }
+  
 }

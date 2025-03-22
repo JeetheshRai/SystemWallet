@@ -39,6 +39,10 @@ export class WalletSetupComponent implements OnInit {
     this.dataService.getWalletData()
   }
 
+  ngOnDestroy() {
+    this.subscriptions.forEach((sub: { unsubscribe: () => any; }) => sub.unsubscribe())
+  }
+
   decimalPlacesValidator(maxDecimalPlaces: number) {
     return (control: AbstractControl): ValidationErrors | null => {
       if (!control.value) return null;
@@ -49,8 +53,10 @@ export class WalletSetupComponent implements OnInit {
 
   async submitForm() {
     if (this.walletForm.valid) {
+      this.dataService.setLoading(true)
       const { name, balance } = this.walletForm.value;
       let walletData = await lastValueFrom(this.walletService.initWallet(name, balance ?? 0));
+      this.dataService.setLoading(false)
       if(walletData.status=='success'){
         this.dataService.setWalletData(walletData.data)
         this.router.navigate(['/transactions']);

@@ -38,21 +38,28 @@ export class TransactionComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.subscriptions.push(this.dataService.$user_data.subscribe(data => {
       this.userData = data
     }))
     this.userData = this.dataService.getWalletData()
     if (!this.userData) {
       this.router.navigate(['/wallet-setup']);
+      return
     }
+    this.dataService.setLoading(true)
     this.loadTransacation()
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((sub: { unsubscribe: () => any; }) => sub.unsubscribe())
   }
 
   async loadTransacation() {
     let limit = this.itemsPerPage
     let skip = (this.currentPage * limit) - limit
     let getTransactionResponse = await lastValueFrom(this.transactionService.loadTransacation(this.userData._id, skip, limit, this.sortPage));
+    this.dataService.setLoading(false)
     if (getTransactionResponse.status == 'success') {
       this.transactions = getTransactionResponse.data.transactionList
       this.transactionCount = getTransactionResponse.data.count
@@ -68,6 +75,7 @@ export class TransactionComponent implements OnInit {
   goToNextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
+      this.dataService.setLoading(true)
       this.loadTransacation()
     }
   }
@@ -75,6 +83,7 @@ export class TransactionComponent implements OnInit {
   goToPreviousPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
+      this.dataService.setLoading(true)
       this.loadTransacation()
     }
   }
@@ -89,14 +98,17 @@ export class TransactionComponent implements OnInit {
     } else if (event.target.value == 'desc') {
       this.sortPage = { amount: -1 }
     }
+    this.dataService.setLoading(true)
     this.loadTransacation()
   }
 
 
   async submitTransaction() {
     if (this.transactionForm.valid) {
+      this.dataService.setLoading(true)
       const { isCredit, balance, description } = this.transactionForm.value;
       let transactionResponse: any = await lastValueFrom(this.transactionService.submitTransaction(this.userData._id, isCredit, balance, description));
+      this.dataService.setLoading(false)
       if (transactionResponse.status == 'success') {
         this.userData.balance = transactionResponse?.data?.balance || this.userData.balance;
           this.dataService.setWalletData(this.userData)
@@ -105,6 +117,7 @@ export class TransactionComponent implements OnInit {
             description: '',
             isCredit: ''
           });
+        this.dataService.setLoading(true)
         this.loadTransacation()
       } else {
         this.toastr.error(transactionResponse?.message || 'Something went wrong.', 'Error');
@@ -140,7 +153,9 @@ export class TransactionComponent implements OnInit {
   }
 
   async refreshData(){
+    this.dataService.setLoading(true)
     let walletResponse: any = await lastValueFrom(this.walletService.getWallet(this.userData._id));
+    this.dataService.setLoading(false)
     if (walletResponse.status == 'success') {
       this.dataService.setWalletData(walletResponse.data)
       this.toastr.success('Successfully refreshed Wallet ID: ' + walletResponse?.data?._id, 'Success');
